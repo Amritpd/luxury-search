@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { GEMINI_EMBEDDING_MODEL } from "../config.js";
+import { GEMINI_EMBEDDING_MODEL, GEMINI_CHAT_MODEL } from "../config.js";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
@@ -43,7 +43,7 @@ Rules:
 
 export async function parseIntent(query: string): Promise<SearchIntent> {
   const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash",
+    model: GEMINI_CHAT_MODEL,
     systemInstruction: SYSTEM,
     generationConfig: { responseMimeType: "application/json", temperature: 0.1 },
   });

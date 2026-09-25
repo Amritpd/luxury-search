@@ -5,16 +5,10 @@ import LatencyPanel, { StageTiming } from "../components/LatencyPanel";
 import PipelineView, { Intent } from "../components/PipelineView";
 import ListingCard, { Listing } from "../components/ListingCard";
 
-// In GitHub Codespaces the phone's browser can't reach localhost:3001, so derive
-// the forwarded API URL from the page hostname when it matches *.app.github.dev.
-function apiBase(): string {
-  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
-  if (typeof window !== "undefined" && /(^|\.)app\.github\.dev$/.test(window.location.hostname)) {
-    return `${window.location.protocol}//${window.location.hostname.replace(/-3000\./, "-3001.")}`;
-  }
-  return "http://localhost:3001";
-}
-const API = apiBase();
+// Same-origin by default: next.config.js proxies /api/* to the API server,
+// so the browser never calls it cross-origin (no CORS, no port-forwarding config).
+// Set NEXT_PUBLIC_API_URL only to point the browser at the API directly.
+const API = process.env.NEXT_PUBLIC_API_URL ?? "";
 
 const EXAMPLES = [
   "3-bed under $1.2M near top-rated schools",

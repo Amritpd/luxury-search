@@ -47,6 +47,8 @@ npm install && npm run seed
 # 3. Run
 npm run dev          # api on :3001
 cd ../web && npm install && npm run dev   # ui on :3000
+# The web app proxies /api/* to the API server (same origin, no CORS).
+# Set API_URL if the API isn't on localhost:3001.
 ```
 
 Open http://localhost:3000 and try: *"walkable condo downtown under $800k"*.

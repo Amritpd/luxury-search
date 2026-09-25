@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getListingsByIds } from "../db.js";
+import { GEMINI_CHAT_MODEL } from "../config.js";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
@@ -35,7 +36,7 @@ export async function rerank(
   if (candidates.length === 0) return [];
 
   const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash",
+    model: GEMINI_CHAT_MODEL,
     generationConfig: { responseMimeType: "application/json", temperature: 0.2 },
   });
 
