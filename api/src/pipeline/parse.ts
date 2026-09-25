@@ -71,8 +71,24 @@ export function fallbackIntent(query: string): SearchIntent {
   return { filters: {}, semantic: query };
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export async function embedText(text: string): Promise<number[]> {
   const model = genAI.getGenerativeModel({ model: GEMINI_EMBEDDING_MODEL });
-  const res = await model.embedContent(text);
-  return res.embedding.values;
+  let attempt = 0;
+  while (true) {
+    try {
+      const res = await model.embedContent(text);
+      return res.embedding.values;
+    } catch (err: any) {
+      const status = err?.status ?? err?.response?.status;
+      if (status !== 429 || attempt >= 4) throw err;
+      const delayMs = 4000 * (2 ** attempt) + 1500;
+      console.warn(`Gemini rate limit hit while embedding query; retrying in ${delayMs}ms (attempt ${attempt + 2}/5)`);
+      await sleep(delayMs);
+      attempt += 1;
+    }
+  }
 }

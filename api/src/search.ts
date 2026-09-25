@@ -33,7 +33,7 @@ export async function ensureIndex() {
           embedding: {
             type: "knn_vector",
             dimension: 3072, // Gemini gemini-embedding-001
-            method: { name: "hnsw", engine: "faiss", space_type: "cosinesimil" },
+            method: { name: "hnsw", engine: "faiss", space_type: "l2" },
           },
         },
       },
