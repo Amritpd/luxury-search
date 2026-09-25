@@ -96,6 +96,37 @@ export async function bm25Retrieve(
   }
 }
 
+import crypto from "node:crypto";
+
+function keyOf(text: string): string {
+  return crypto.createHash("sha256").update(text).digest("hex");
+}
+
+function cosineSimilarity(a: number[], b: number[]): number {
+  if (!a || !b || a.length !== b.length) return 0;
+  let dot = 0;
+  let normA = 0;
+  let normB = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    normA += a[i] * a[i];
+    normB += b[i] * b[i];
+  }
+  if (normA === 0 || normB === 0) return 0;
+  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+function loadEmbeddingCache(): Map<string, number[]> {
+  try {
+    const raw = JSON.parse(
+      fs.readFileSync(new URL("../../../data/.embedding-cache.json", import.meta.url), "utf8")
+    );
+    return new Map(Object.entries(raw));
+  } catch {
+    return new Map();
+  }
+}
+
 /** Vector retrieval: k-NN over listing embeddings, same filters applied. */
 export async function knnRetrieve(
   intent: SearchIntent,
@@ -122,8 +153,25 @@ export async function knnRetrieve(
     const hits = (res.body.hits.hits ?? []) as Array<{ _id: string }>;
     return hits.map((h, i) => ({ id: h._id, score: 1 / (60 + i + 1), source: "knn" as const }));
   } catch {
-    // In-memory candidate retrieval fallback
+    // In-memory candidate retrieval using cached 3072-dim embeddings if present
+    const cache = loadEmbeddingCache();
     const filtered = ALL_LISTINGS.filter((l) => matchFilters(l, intent));
+
+    if (cache.size > 0 && queryVector && queryVector.length > 0) {
+      const scored = filtered.map((l) => {
+        const textKey = keyOf(`${l.description} ${l.neighborhood}, ${l.city}`);
+        const vec = cache.get(textKey);
+        const sim = vec ? cosineSimilarity(queryVector, vec) : 0;
+        return { id: l.id, sim };
+      });
+      scored.sort((a, b) => b.sim - a.sim);
+      return scored.slice(0, size).map((doc, i) => ({
+        id: doc.id,
+        score: 1 / (60 + i + 1),
+        source: "knn" as const,
+      }));
+    }
+
     return filtered.slice(0, size).map((l, i) => ({
       id: l.id,
       score: 1 / (60 + i + 1),
