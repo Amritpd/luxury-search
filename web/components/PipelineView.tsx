@@ -16,36 +16,41 @@ export default function PipelineView({ intent }: { intent: Intent }) {
     activeFilters.push(["walk_score_min", intent.walk_score_min]);
 
   return (
-    <div className="rounded-xl border border-emerald-900/60 bg-emerald-950/30 p-4">
-      <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-emerald-300">
-        What the AI understood
-      </h3>
-      <div className="mb-3 flex flex-wrap gap-2">
+    <div className="rounded-[20px] border border-stone-200 bg-white/70 p-5 shadow-[0_4px_20px_rgba(27,29,26,0.04)]">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-[#a88f5b]">
+          What the AI understood
+        </h3>
+        <span className="text-[10px] font-mono uppercase tracking-wider text-[#2d4039] bg-[#2d4039]/10 px-2 py-0.5 rounded-full">
+          Intent Parsed
+        </span>
+      </div>
+      <div className="mb-3 flex flex-wrap gap-1.5">
         {activeFilters.length === 0 && (
-          <span className="text-xs text-emerald-500">no hard filters — pure semantic search</span>
+          <span className="text-xs text-stone-500 italic">no hard constraints — full semantic vector match</span>
         )}
         {activeFilters.map(([k, v]) => (
           <span
             key={k}
-            className="rounded-full bg-emerald-900/60 px-3 py-1 font-mono text-xs text-emerald-200"
+            className="rounded-md border border-[#2d4039]/15 bg-[#2d4039]/5 px-2.5 py-1 font-mono text-xs font-medium text-[#2d4039]"
           >
-            {k}: {Array.isArray(v) ? v.join(", ") : String(v)}
+            {k}: <span className="font-semibold">{Array.isArray(v) ? v.join(", ") : String(v)}</span>
           </span>
         ))}
       </div>
-      <p className="text-xs italic leading-relaxed text-emerald-100/70">
+      <p className="text-xs italic leading-relaxed text-stone-700 bg-stone-50/80 p-2.5 rounded-xl border border-stone-200/60">
         “{intent.semantic}”
       </p>
-      <div className="mt-3 flex items-center gap-2 text-[11px] text-emerald-500">
-        <span>NL query</span>
-        <span aria-hidden>→</span>
-        <span>structured intent</span>
-        <span aria-hidden>→</span>
-        <span>hybrid BM25 + k-NN</span>
-        <span aria-hidden>→</span>
-        <span>RRF fusion</span>
-        <span aria-hidden>→</span>
-        <span>LLM rerank</span>
+      <div className="mt-3.5 flex flex-wrap items-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.12em] text-stone-500">
+        <span className="text-stone-700">NL query</span>
+        <span aria-hidden className="text-[#a88f5b]">→</span>
+        <span className="text-stone-700">structured intent</span>
+        <span aria-hidden className="text-[#a88f5b]">→</span>
+        <span className="text-stone-700">hybrid BM25 + k-NN</span>
+        <span aria-hidden className="text-[#a88f5b]">→</span>
+        <span className="text-stone-700">RRF fusion</span>
+        <span aria-hidden className="text-[#a88f5b]">→</span>
+        <span className="text-[#2d4039] font-semibold">LLM rerank</span>
       </div>
     </div>
   );

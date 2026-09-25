@@ -41,13 +41,27 @@ Rules:
 - Known cities: Austin, Denver, Phoenix. Only set cities if the query names one.
 - semantic should capture everything the filters can't: lifestyle, architecture, feel.`;
 
+async function generateWithRetry(model: any, prompt: string, attempt = 0): Promise<any> {
+  try {
+    return await model.generateContent(prompt);
+  } catch (err: any) {
+    const status = err?.status ?? err?.response?.status;
+    if ((status === 429 || status === 503 || (status >= 500 && status < 600)) && attempt < 3) {
+      const delayMs = 1500 * (2 ** attempt) + Math.random() * 500;
+      await sleep(delayMs);
+      return generateWithRetry(model, prompt, attempt + 1);
+    }
+    throw err;
+  }
+}
+
 export async function parseIntent(query: string): Promise<SearchIntent> {
   const model = genAI.getGenerativeModel({
     model: GEMINI_CHAT_MODEL,
     systemInstruction: SYSTEM,
     generationConfig: { responseMimeType: "application/json", temperature: 0.1 },
   });
-  const res = await model.generateContent(`Query: "${query}"`);
+  const res = await generateWithRetry(model, `Query: "${query}"`);
   const parsed = JSON.parse(res.response.text());
   return {
     filters: {
@@ -84,9 +98,9 @@ export async function embedText(text: string): Promise<number[]> {
       return res.embedding.values;
     } catch (err: any) {
       const status = err?.status ?? err?.response?.status;
-      if (status !== 429 || attempt >= 4) throw err;
-      const delayMs = 4000 * (2 ** attempt) + 1500;
-      console.warn(`Gemini rate limit hit while embedding query; retrying in ${delayMs}ms (attempt ${attempt + 2}/5)`);
+      if ((status !== 429 && status !== 503 && status < 500) || attempt >= 4) throw err;
+      const delayMs = 1500 * (2 ** attempt) + 500;
+      console.warn(`Gemini API retry for embedding; retrying in ${delayMs}ms (attempt ${attempt + 2}/5)`);
       await sleep(delayMs);
       attempt += 1;
     }

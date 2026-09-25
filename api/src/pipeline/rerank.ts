@@ -59,7 +59,21 @@ Rank at most ${topN}. "why" must reference concrete listing attributes, not gene
 Candidates:
 ${catalog}`;
 
-  const res = await model.generateContent(prompt);
+  let res: any;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      res = await model.generateContent(prompt);
+      break;
+    } catch (err: any) {
+      const status = err?.status ?? err?.response?.status;
+      if ((status === 429 || status === 503 || (status >= 500 && status < 600)) && attempt < 2) {
+        const delayMs = 1500 * (2 ** attempt) + Math.random() * 500;
+        await new Promise((r) => setTimeout(r, delayMs));
+        continue;
+      }
+      throw err;
+    }
+  }
   const parsed = JSON.parse(res.response.text());
   const order: Array<{ id: string; why: string }> = parsed.ranking ?? [];
   const byId = new Map(candidates.map((c: any) => [c.id, c]));
