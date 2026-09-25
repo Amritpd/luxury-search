@@ -4,13 +4,14 @@
  *
  *   npm run seed
  */
+import "dotenv/config"; // must run before ../search.js is evaluated (ESM hoists imports)
 import fs from "node:fs";
 import pg from "pg";
-import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { osClient, ensureIndex, INDEX } from "../search.js";
 
-dotenv.config();
+// Data files live at the repo root, but `npm run seed` executes with api/ as cwd.
+const ROOT = new URL("../../..", import.meta.url);
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
@@ -29,12 +30,15 @@ async function embedBatch(texts: string[]): Promise<number[][]> {
 }
 
 async function main() {
-  const listings = JSON.parse(fs.readFileSync("data/listings.json", "utf8"));
+  for (const k of ["GEMINI_API_KEY", "PG_URL", "OPENSEARCH_NODE"]) {
+    if (!process.env[k]) throw new Error(`${k} is not set — copy api/.env.example to api/.env and fill it in.`);
+  }
+  const listings = JSON.parse(fs.readFileSync(new URL("data/listings.json", ROOT), "utf8"));
   console.log(`Seeding ${listings.length} listings...`);
 
   // Postgres
   const pool = new pg.Pool({ connectionString: process.env.PG_URL });
-  await pool.query(fs.readFileSync("data/seed.sql", "utf8"));
+  await pool.query(fs.readFileSync(new URL("data/seed.sql", ROOT), "utf8"));
   console.log("Postgres seeded.");
 
   // Embeddings (one-time cost, cached in the index afterwards)

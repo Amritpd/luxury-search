@@ -1,14 +1,12 @@
+import "dotenv/config"; // must run before ./db.js / ./search.js are evaluated (ESM hoists imports)
 import Fastify from "fastify";
 import cors from "@fastify/cors";
-import dotenv from "dotenv";
 import { pingDb } from "./db.js";
 import { pingSearch, ensureIndex } from "./search.js";
 import { Timer } from "./pipeline/timing.js";
 import { parseIntent, fallbackIntent, embedText } from "./pipeline/parse.js";
 import { bm25Retrieve, knnRetrieve, reciprocalRankFusion } from "./pipeline/retrieve.js";
 import { rerank } from "./pipeline/rerank.js";
-
-dotenv.config();
 
 const app = Fastify({ logger: true });
 await app.register(cors, { origin: true });

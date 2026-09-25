@@ -2,7 +2,11 @@ import { Client } from "@opensearch-project/opensearch";
 
 export const INDEX = "listings";
 
-export const osClient = new Client({ node: process.env.OPENSEARCH_NODE! });
+if (!process.env.OPENSEARCH_NODE) {
+  throw new Error("OPENSEARCH_NODE is not set — copy api/.env.example to api/.env and fill it in.");
+}
+
+export const osClient = new Client({ node: process.env.OPENSEARCH_NODE });
 
 /** Create the listings index with text + vector mappings if it doesn't exist. */
 export async function ensureIndex() {
