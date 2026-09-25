@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GEMINI_EMBEDDING_MODEL } from "../config.js";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
@@ -71,7 +72,7 @@ export function fallbackIntent(query: string): SearchIntent {
 }
 
 export async function embedText(text: string): Promise<number[]> {
-  const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
+  const model = genAI.getGenerativeModel({ model: GEMINI_EMBEDDING_MODEL });
   const res = await model.embedContent(text);
   return res.embedding.values;
 }

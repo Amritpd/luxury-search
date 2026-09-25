@@ -32,7 +32,7 @@ export async function ensureIndex() {
           days_on_market: { type: "integer" },
           embedding: {
             type: "knn_vector",
-            dimension: 768, // Gemini text-embedding-004
+            dimension: 3072, // Gemini gemini-embedding-001
             method: { name: "hnsw", engine: "faiss", space_type: "cosinesimil" },
           },
         },

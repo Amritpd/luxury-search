@@ -54,7 +54,7 @@ Open http://localhost:3000 and try: *"walkable condo downtown under $800k"*.
 ## Roadmap — every piece is swappable
 
 **Phase 1 — this demo (prove the pipeline).** Off-the-shelf everywhere: Gemini for
-parsing, `text-embedding-004` for vectors, LLM rerank. Proves the shape of the system.
+parsing, `gemini-embedding-001` for vectors, LLM rerank. Proves the shape of the system.
 
 **Phase 2 — production hardening (cost × latency reality).**
 - Swap frontier-LLM parsing for a **fine-tuned small model**. Intent parsing doesn't

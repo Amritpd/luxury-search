@@ -8,6 +8,7 @@ import "dotenv/config"; // must run before ../search.js is evaluated (ESM hoists
 import fs from "node:fs";
 import pg from "pg";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GEMINI_EMBEDDING_MODEL } from "../config.js";
 import { osClient, ensureIndex, INDEX } from "../search.js";
 
 // Data files live at the repo root, but `npm run seed` executes with api/ as cwd.
@@ -16,8 +17,8 @@ const ROOT = new URL("../../..", import.meta.url);
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 async function embedBatch(texts: string[]): Promise<number[][]> {
-  const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
-  // text-embedding-004 takes one input per call; parallelize modestly
+  const model = genAI.getGenerativeModel({ model: GEMINI_EMBEDDING_MODEL });
+  // The embedding API accepts a single input per call; batch them modestly.
   const out: number[][] = [];
   for (let i = 0; i < texts.length; i += 8) {
     const chunk = texts.slice(i, i + 8);
