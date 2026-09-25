@@ -11,7 +11,7 @@ export interface Listing {
   walk_score: number;
   days_on_market: number;
   description: string;
-  why: string;
+  why?: string;
 }
 
 export default function ListingCard({ listing, rank }: { listing: Listing; rank: number }) {

@@ -1,4 +1,5 @@
 import "./env.js";
+import fs from "node:fs";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import { pingDb } from "./db.js";
@@ -7,6 +8,14 @@ import { Timer } from "./pipeline/timing.js";
 import { parseIntent, fallbackIntent, embedText } from "./pipeline/parse.js";
 import { bm25Retrieve, knnRetrieve, reciprocalRankFusion } from "./pipeline/retrieve.js";
 import { rerank } from "./pipeline/rerank.js";
+
+const FALLBACK_LISTINGS = JSON.parse(
+  fs.readFileSync(new URL("../../data/listings.json", import.meta.url), "utf8")
+) as Array<Record<string, any>>;
+const FALLBACK_RESULTS = FALLBACK_LISTINGS.slice(0, 12).map((listing) => ({
+  ...listing,
+  why: listing.why ?? "Synthetic listing from the demo dataset.",
+}));
 
 const app = Fastify({ logger: true });
 await app.register(cors, { origin: true });
@@ -65,8 +74,16 @@ app.post("/api/search", async (req, reply) => {
       candidates_considered: fused.length,
     };
   } catch (err) {
-    req.log.error(err);
-    return reply.code(500).send({ error: "search failed", detail: String(err) });
+    req.log.warn({ err }, "search pipeline failed; using synthetic fallback dataset");
+    return {
+      query,
+      intent: fallbackIntent(query),
+      results: FALLBACK_RESULTS,
+      timings: [],
+      total_ms: 0,
+      candidates_considered: FALLBACK_RESULTS.length,
+      warning: "Gemini is temporarily unavailable; showing the synthetic dataset fallback.",
+    };
   }
 });
 

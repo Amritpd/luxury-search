@@ -1,8 +1,43 @@
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --lp-ivory: #f3eee7;
+  --lp-ivory-strong: #e6dfd4;
+  --lp-ink: #1b1d1a;
+  --lp-ink-soft: #4a4f49;
+  --lp-stone: #c9bca5;
+  --lp-gold: #a88f5b;
+  --lp-moss: #2d4039;
+  --lp-panel: rgba(255, 255, 255, 0.48);
+  --lp-border: rgba(27, 29, 26, 0.12);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background: #0a0f0d;
-  color: #e8ece9;
+  background:
+    radial-gradient(circle at top, rgba(168, 143, 91, 0.1), transparent 35%),
+    linear-gradient(180deg, #efe7dc 0%, #f8f5f1 100%);
+  color: var(--lp-ink);
+  font-family: "Inter", sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Cormorant Garamond", serif;
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background: rgba(168, 143, 91, 0.25);
 }
