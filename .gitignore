@@ -10,3 +10,4 @@ dist/
 pgdata/
 osdata/
 __pycache__/
+.embedding-cache.json
