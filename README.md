@@ -1,5 +1,9 @@
 # Groundtruth — natural-language home search
 
+> Most real estate aggregators are stuck in 2005 — built on the primitive tools of their era, where every search was a SQL WHERE clause. They make it nearly impossible to surface the homes a buyer actually wants, because they can't understand human intent. LLMs can bridge that gap — but at a billion requests a month, their probabilistic nature and brutal compute costs become their own problem. There is a more elegant solution.
+>
+> Every realtor site makes you click forty checkboxes and you still can't describe the house you actually want. So I built the thing I wished existed.
+
 A technical demo of **AI-powered discovery for real estate search**: type what you want
 in plain English, and a pipeline of intent parsing → hybrid retrieval → reranking
 returns the best listings, with per-stage latency shown.
