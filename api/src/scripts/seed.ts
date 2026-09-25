@@ -10,7 +10,7 @@
  *
  *   npm run seed
  */
-import "dotenv/config"; // must run before ../search.js is evaluated (ESM hoists imports)
+import "../env.js";
 import fs from "node:fs";
 import crypto from "node:crypto";
 import pg from "pg";

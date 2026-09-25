@@ -1,4 +1,4 @@
-import "dotenv/config"; // must run before ./db.js / ./search.js are evaluated (ESM hoists imports)
+import "./env.js";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import { pingDb } from "./db.js";
