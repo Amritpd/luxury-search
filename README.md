@@ -40,7 +40,7 @@ generation hallucinates; matching by distance doesn't.
 docker compose up -d
 
 # 2. Data → Postgres + OpenSearch (one-time Gemini embedding cost, ~pennies)
-cd data && python3 generate_listings.py && cd ..
+python3 data/generate_listings.py   # run from repo root
 cd api && cp .env.example .env   # add GEMINI_API_KEY
 npm install && npm run seed
 
